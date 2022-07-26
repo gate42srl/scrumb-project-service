@@ -1,40 +1,30 @@
-import { Request, Response } from "express"
-import { IResponse } from "../../types"
+import { NextFunction, Request, Response } from "express"
+import { createPojectHandler, role, project, getByUserId_output } from "../../types"
+import { createProject, getByUserId, updateRole } from "../../controller"
+import { updateUser } from "../../service"
 
-export const getAll = async (req: Request, res: Response<IResponse<any>>) => {}
+export const createHandler = async (req: Request, res: Response, next: NextFunction) => {
+  // Getting data
+  const body: createPojectHandler = req.body
+  // Create new project
+  const newProject: project = await createProject(req.tokenData.id, body)
+  // Add project to user's myProjects
+  await updateUser(newProject.ownerId, { $push: { myProjects: newProject._id } })
 
-export const getById = async (req: Request, res: Response<IResponse<any>>) => {
-  res.send({ success: false, message: "Not implemented" })
+  res.status(200).json(newProject)
 }
 
-export const getLastLogin = async (req: Request, res: Response<IResponse<any>>) => {
-  res.send({ success: false, message: "Not implemented yet" })
+export const myProjectsHandler = async (req: Request, res: Response, next: NextFunction) => {
+  // Getting data
+  const userId: string = req.tokenData._id
+  // Getting projects
+  const projects: getByUserId_output = await getByUserId(userId)
+  // send
+  res.status(200).json(projects)
 }
 
-export const createUser = async (req: Request, res: Response<IResponse<any>>) => {
-  res.send({ success: false, message: "Not implemented yet" })
-}
-
-export const updateUser = async (req: Request, res: Response<IResponse<any>>) => {
-  res.send({ success: false, message: "Not implemented yet" })
-}
-
-export const patchUser = async (req: Request, res: Response<IResponse<any>>) => {
-  res.send({ success: false, message: "Not implemented yet" })
-}
-
-export const changePassword = async (req: Request, res: Response<IResponse<any>>) => {
-  res.send({ success: false, message: "Not implemented yet" })
-}
-
-export const recoverPassword = async (req: Request, res: Response<IResponse<any>>) => {
-  res.send({ success: false, message: "Not implemented yet" })
-}
-
-export const deleteUser = async (req: Request, res: Response<IResponse<any>>) => {
-  res.send({ success: false, message: "Not implemented yet" })
-}
-
-export const checkIsValid = async (req: Request, res: Response<IResponse<any>>) => {
-  res.send({ success: false, message: "Not implemented yet" })
+export const updateRoleHandler = async (req: Request, res: Response, next: NextFunction) => {
+  const roleUser: role = req.body.roleUser
+  const updatedproject = (await updateRole(req.project, roleUser, req.body.roleUpdate)) as project
+  res.status(200).json(updatedproject)
 }

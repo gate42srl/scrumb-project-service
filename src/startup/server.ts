@@ -25,7 +25,7 @@ const app = express()
 
 process.on("uncaughtException", (err) => {
   // This only works for synchronous code
-  console.log("unhandledException error...", err)
+  console.log("unhandledException error...", err.message)
 })
 
 process.on("unhandledRejection", async (err, promise) => {

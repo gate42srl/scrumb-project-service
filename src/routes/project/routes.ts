@@ -4,12 +4,15 @@ import { Router } from "express"
 const router = Router()
 
 // Import middleware functions
-import { validateBody, checkToken } from "../../middleware"
+import { validateBody, checkToken, isProjectOwner } from "../../middleware"
 // Import validation functions
-import {} from "../../validation"
+import { validateCreate } from "../../validation"
 // Import handlers
-import {} from "./handler"
+import { createHandler, myProjectsHandler, updateRoleHandler } from "./handler"
 
 // API
+router.get("/myProjects", checkToken(["User"]), myProjectsHandler)
+router.post("/", checkToken(["User"]), /* validateBody(validateCreate), */ createHandler)
+router.put("/role/:id", isProjectOwner, updateRoleHandler)
 
 export default router

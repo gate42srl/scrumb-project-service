@@ -1,9 +1,17 @@
-export interface tokenLog {
+export interface project {
   _id: string
-  token: string
-  refreshToken: string
-  userId: string
-  timestamp: number
+  name: string
+  type: string
+  description: string
+  ownerId: string
+  role: role[]
+  createdAt: number
+  modified: number
+}
+
+export interface role {
+  user: string
+  role: string
 }
 
 export interface user {
@@ -13,6 +21,6 @@ export interface user {
   email: string
   password: string
   myProjects: string[]
-  SharedProjects: string[]
+  sharedProjects: string[]
   isAdmin: boolean
 }
