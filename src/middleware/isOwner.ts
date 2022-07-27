@@ -1,10 +1,8 @@
 import { NextFunction, Request, Response } from "express"
 import config from "config"
-import jwt, { JsonWebTokenError } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import { AUTHORIZATION_ERROR } from "../error"
 import { Project } from "../model/project"
-import { project } from "../types"
-import { MongooseDocumentMiddleware, Model, Query } from "mongoose"
 
 export const isProjectOwner = async (req: Request, res: Response, next: NextFunction) => {
   let payload: any
@@ -15,10 +13,12 @@ export const isProjectOwner = async (req: Request, res: Response, next: NextFunc
   } else {
     // Retrieving and first data check
     payload = jwt.verify(token, config.get("JWT_SECRET_KEY"))
-    const project: any = await Project.findById(req.params.id) // returned value : project | null
-    if (!project) throw new AUTHORIZATION_ERROR("no project with the provided id...")
-    // Check user making request is pOwner
-    if (project.ownerId != payload.id) throw new AUTHORIZATION_ERROR("not authorized...")
+    const project: any = await Project.findById(req.params.id)
+
+    if (!project || project.ownerId != payload.id) {
+      const message: string = project == null ? "no project with the provided id..." : "not authorized..."
+      throw new AUTHORIZATION_ERROR(message)
+    }
     // Update req object with useful info
     req.project = project
     return next()

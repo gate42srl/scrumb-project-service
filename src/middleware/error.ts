@@ -1,7 +1,13 @@
 // Express error middleware
 import axios, { AxiosError } from "axios"
 import { NextFunction, Request, Response } from "express"
-import { UNCAUGHT_EXCEPTION_ERROR, UNHANDLED_REJECTION_ERROR, VALIDATION_ERROR, AUTHORIZATION_ERROR } from "../error"
+import {
+  UNCAUGHT_EXCEPTION_ERROR,
+  UNHANDLED_REJECTION_ERROR,
+  VALIDATION_ERROR,
+  AUTHORIZATION_ERROR,
+  UPDATE_ROLE_ERROR,
+} from "../error"
 import { TokenExpiredError, JsonWebTokenError, NotBeforeError } from "jsonwebtoken"
 import { errorObj } from "../types"
 
@@ -48,6 +54,10 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
     obj.description = "AUTHORIZATION_ERROR"
     obj.message = err.message
     res.status(401).json(obj)
+  } else if (err instanceof UPDATE_ROLE_ERROR) {
+    obj.description = "UPDATE_ROLE_ERROR"
+    obj.message = err.message
+    res.status(403).json(obj)
   } else {
     console.log(err)
     res.status(500).json("unknown error from auth microservice")

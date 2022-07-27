@@ -9,3 +9,6 @@ export class VALIDATION_ERROR extends Error {
   }
 }
 export class AUTHORIZATION_ERROR extends Error {}
+
+// Custom errors for functions
+export class UPDATE_ROLE_ERROR extends Error {}

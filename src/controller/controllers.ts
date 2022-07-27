@@ -1,6 +1,7 @@
 import { Project } from "../model/project"
 import { project, role, user, getByUserId_output } from "../types"
 import { getUserById } from "../service"
+import { UPDATE_ROLE_ERROR } from "../error"
 
 export const createProject = async (userId: string, body: any): Promise<project> => {
   // Check the user on db
@@ -32,15 +33,16 @@ export const getByUserId = async (userId: string): Promise<getByUserId_output> =
   return projects
 }
 
-export const updateRole = async (project: any, userRole: role, roleUpdate: string): Promise<project | null> => {
-  const index: number = project.role.findIndex((e: any) => e.user == userRole.user)
-  if (index == -1) throw new Error("user not found")
-  /*   const updatedProject: project | null = await Project.findByIdAndUpdate(project._id, {
-    $set: { "role.index": roleUpdate },
-  })
-  return updatedProject */
+export const updateRole = async (project: any, userRole: role, roleUpdate: string): Promise<project> => {
+  // Get the position of user to update in the role array
+  const index: number = project.role.findIndex((e: role) => e.user == userRole.user)
+  // Check user to update is not pOwner
+  if (index == -1 || project.role[index].role == "pOwner") {
+    const message = index == -1 ? "user not found" : "not authorized to change pOwner role"
+    throw new UPDATE_ROLE_ERROR(message)
+  }
+  // Update
   project.role[index].role = roleUpdate
   const updatedProject: project = await project.save()
   return updatedProject
-  // PLEASE CHECK IF THE USER TO BE UPDATED IS THE PoWNER
 }
